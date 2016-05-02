@@ -14,5 +14,13 @@ g = Github()
 
 repo = g.get_user(g_user).get_repo(g_repo)
 
+bz_numbers = set()
 for pr in repo.get_pulls():
-    print(pr)
+    for commit in pr.get_commits():
+        headline = commit.commit.message.split('\n', 1)[0]
+        tag = re.search('RhBug:[0-9,\s]+\)', headline)
+        if tag:
+            for bz_number in re.findall('[0-9]+', tag.group(0)):
+                bz_numbers.add((bz_number, pr.html_url))
+
+print(bz_numbers)
